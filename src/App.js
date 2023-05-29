@@ -1,4 +1,6 @@
 import {Component} from 'react'
+import {v4 as uuidV4} from 'uuid'
+
 import SlidesTab from './components/SlidesTab'
 
 import './App.css'
@@ -55,25 +57,46 @@ class App extends Component {
   }
 
   onClickChangeHeading = () => {
-    this.setState(prevState => ({
-      activeHeading: !prevState.activeHeading,
+    this.setState({
+      activeHeading: true,
       activeDescription: false,
-    }))
+    })
   }
 
   onClickChangeDescription = () => {
-    this.setState(prevState => ({
-      activeDescription: !prevState.activeDescription,
+    this.setState({
+      activeDescription: true,
       activeHeading: false,
-    }))
+    })
   }
 
-  onLostDescriptionFocus = () => {
-    this.setState({activeDescription: false})
+  onLostDescriptionFocus = event => {
+    const {slidesList, activeTab} = this.state
+    const updatedList = slidesList.map(eachItem => {
+      if (eachItem.id === activeTab) {
+        if (eachItem.description === '') {
+          return {...eachItem, description: 'Description'}
+        }
+        return {...eachItem, description: event.target.value}
+      }
+      return eachItem
+    })
+    this.setState({activeDescription: false, slidesList: updatedList})
   }
 
-  onLostHeadingFocus = () => {
-    this.setState({activeHeading: false})
+  onLostHeadingFocus = event => {
+    const {slidesList, activeTab} = this.state
+    const updatedList = slidesList.map(eachItem => {
+      if (eachItem.id === activeTab) {
+        if (eachItem.heading === '') {
+          return {...eachItem, heading: 'Heading'}
+        }
+        return {...eachItem, heading: event.target.value}
+      }
+      return eachItem
+    })
+
+    this.setState({activeHeading: false, slidesList: updatedList})
   }
 
   onChangeHeading = event => {
@@ -91,11 +114,12 @@ class App extends Component {
     const {slidesList} = this.state
     const value = slidesList.findIndex(eachItem => eachItem.id === id)
     console.log(value)
+
     this.setState({
-      initialIndex: value,
       activeTab: id,
       activeDescription: false,
       activeHeading: false,
+      initialIndex: value,
     })
   }
 
@@ -112,31 +136,30 @@ class App extends Component {
 
   onClickChangeTab = () => {
     const {initialIndex, slidesList} = this.state
-    const newIndex = initialIndex + 1
 
-    if (newIndex >= slidesList.length) {
-      this.setState({
-        initialIndex: 0,
-        activeTab: slidesList[0].id,
-        activeHeading: false,
-        activeDescription: false,
-      })
-    } else {
-      this.setState({
-        initialIndex: newIndex,
-        activeTab: slidesList[newIndex].id,
-        activeHeading: false,
-        activeDescription: false,
-      })
+    const newSlide = {
+      id: uuidV4(),
+      heading: 'Heading',
+      description: 'Description',
     }
+
+    const updatedSlidesList = [
+      ...slidesList.slice(0, initialIndex + 1),
+      newSlide,
+      ...slidesList.slice(initialIndex + 1),
+    ]
+
+    this.setState({
+      slidesList: updatedSlidesList,
+      activeTab: newSlide.id,
+      activeDescription: false,
+      activeHeading: false,
+    })
   }
 
   getFromActiveTab = () => {
     const {slidesList, activeTab} = this.state
-    const activeTabDetails = slidesList.find(
-      eachItem => eachItem.id === activeTab,
-    )
-    return activeTabDetails
+    return slidesList.find(eachItem => eachItem.id === activeTab)
   }
 
   render() {
