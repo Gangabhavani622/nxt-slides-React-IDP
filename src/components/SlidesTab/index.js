@@ -10,16 +10,14 @@ const SlidesTab = props => {
   }
 
   return (
-    <li className={`list-item ${activeBtn}`} testid={`slideTab${slideNum}`}>
+    <li className={`list-item ${activeBtn}`} onClick={onClickUpdateActiveTab} testid={`slideTab${slideNum}`}>
       <p className="slide-index">{slideNum}</p>
-      <button
-        type="button"
-        onClick={onClickUpdateActiveTab}
+      <div
         className="btn-item"
       >
         <h1 className="slide-heading">{heading}</h1>
         <p className="slide-description">{description}</p>
-      </button>
+      </div>
     </li>
   )
 }
